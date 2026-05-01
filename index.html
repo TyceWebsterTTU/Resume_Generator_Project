@@ -17,7 +17,82 @@
                         <h5>Fill in the fields below to generate your hit resume!</h5>
                     </div>
                     <div class="card-body">
-                        
+                        <form id="resumeForm">
+                            <div class="mb-3">
+                                <h5>Personel Information</h5>
+                                <label class="form-label" for="txtFirstName">First Name</label>
+                                <input class="form-control" id="txtFirstName" type="text">
+                                <label class="form-label" for="txtLastName">Last Name</label>
+                                <input class="form-control" id="txtLastName" type="text">
+                                <label class="form-label" for="txtEmail">Email</label>
+                                <input class="form-control" id="txtEmail" type="email">
+                                <label class="form-label" for="txtPhone">Phone Number</label>
+                                <input class="form-control" id="txtPhone" type="text">
+                                <label class="form-label" for="txtAddress">Address</label>
+                                <input class="form-control" id="txtAddress" type="text">
+                                <label class="form-label" for="txtLinkedIn">LinkedIn</label>
+                                <input class="form-control" id="txtLinkedIn" type="text">
+                                <label class="form-label" for="txtGitHub">GitHub</label>
+                                <input class="form-control" id="txtGitHub" type="text">
+                                <hr>
+                            </div>
+                            <div class="mb-3">
+                                <h5>Work Experience</h5>
+                                <label class="form-label" for="txtJobTitle">Job Title</label>
+                                <input class="form-control" id="txtJobTitle" type="text">
+                                <label class="form-label" for="txtCompany">Company</label>
+                                <input class="form-control" id="txtCompany" type="text">
+                                <label class="form-label" for="txtJobDescription">Job Description</label>
+                                <input class="form-control" id="txtJobDescription" type="text">
+                                <label class="form-label" for="txtJobLocation">Job Location</label>
+                                <input class="form-control" id="txtJobLocation" type="text">
+                                <label class="form-label" for="txtStartDate">Start Date</label>
+                                <input class="form-control" id="txtStartDate" type="text">
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" id="chkCurrentlyWorking">
+                                    <label class="form-check-label" for="chkCurrentlyWorking">Currently Working</label>
+                                </div>
+                                <label class="form-label" for="txtEndDate">End Date</label>
+                                <input class="form-control" id="txtEndDate" type="text">
+                                <hr>
+                            </div>
+                            <div class="mb-3">
+                                <h5>Skills</h5>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="txtSkillInput" placeholder="e.g. JavaScript, Project Management">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnAddSkill">Add</button>
+                                </div>
+                                <div id="skillsContainer" class="d-flex flex-wrap gap-2"><!-- Skills will be appended here as badges --></div>
+                                <hr>
+                            </div>
+                            <div class="mb-3">
+                                <h5>Awards & Certifications</h5>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="txtCertsAwardsInput">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnAddCertsAwards">Add</button>
+                                </div>
+                                <div id="certsAwardsContainer" class="d-flex flex-wrap gap-2"><!-- Skills will be appended here as badges --></div>
+                                <hr>
+                            </div>
+                        </form>
+                        <!--
+                        <div class="row g-2 mt-2">
+                            <div class="col-6">
+                                <button id="addPersonelBtn" type="button" class="btn btn-primary w-100">Add Personel Information</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="addJobsBtn" type="button" class="btn btn-primary w-100">Add Job Information</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="addSkillsBtn" type="button" class="btn btn-primary w-100">Add Skills</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="addCertsAwardsBtn" type="button" class="btn btn-primary w-100">Add Certifications & Awards</button>
+                            </div>
+                        </div>
+                        <hr>
+                        -->
+                        <button id="generateResumeBtn" type="button" class="btn btn-lg btn-primary w-100 fw-bold py-4 mt-4 my-4" onclick="generateResume()">Generate Resume!</button>
                     </div>
                 </div>
             </div>
@@ -26,7 +101,6 @@
     
     <script src="app/lib/jquery-4.0.0.min.js"></script>
     <script src="app/lib/bootstrap.bundle.min.js"></script>
-    <script src="app/lib/jquery-4.0.0.slim.min.js"></script>
     <script src="app/lib/dataTables.min.js"></script>
     <script src="app/lib/sweetalert2@11.js"></script>
     <script src="app/app.js"></script>
