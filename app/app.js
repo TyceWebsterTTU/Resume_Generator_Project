@@ -1,7 +1,7 @@
 const regEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
 function showAlert(strIcon, strTitle, strText) {
-    return showAlert.fire({
+    return Swal.fire({
         icon: strIcon,
         title: strTitle,
         text: strText
@@ -40,7 +40,7 @@ $(document).ready(function() {
                     </div>
                 </div>`;
 
-            $('#jobsContainer').append(strJobBadge);
+            $('#jobContainer').append(strJobBadge);
             
             // Clear inputs for the next job entry
             $('#jobInputArea input, #jobInputArea textarea').val('');
