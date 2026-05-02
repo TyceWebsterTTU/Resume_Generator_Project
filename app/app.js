@@ -123,7 +123,7 @@ function collectFormData() {
         strGitHub: $('#txtGitHub').val().trim(),
 
         arrWorkExperience: $('.job-badge').map(function() {
-            return $(this).contents().get(0).nodeValue.trim()
+            return $(this).data('job'); 
         }).get(),
 
         arrSkills: $('.skill-badge').map(function() {
@@ -168,7 +168,7 @@ async function generateResume() {
     }
 
     try {
-        const objResponse = await fetch('/generate', {
+        const objResponse = await fetch('http:/localhost:8000/generate', {
             method: 'POST',
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify(objFormData)
