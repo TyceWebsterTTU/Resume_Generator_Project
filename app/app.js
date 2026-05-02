@@ -147,7 +147,36 @@ function validateFormData(objData) {
         return 'Please enter your email address.'
     } else if(!regEmail.test(objData.strEmail)) {
         return 'Please enter a valid email address.'
+    } else if (!objData.arrWorkExperience || objData.arrWorkExperience == 0) {
+        return 'Please add some work experience.'
+    } else if (!objData.arrSkills || objData.arrSkills == 0) {
+        return 'Please add some skills.'
+    } else if (!objData.arrCertsAwards || objData.arrCertsAwards == 0) {
+        return 'Please add some awards or certifications.'
     } else {
         return null
+    }
+}
+
+async function generateResume() {
+    const objFormData = collectFormData()
+
+    const strValidationErr = validateFormData(objFormData)
+    if(strValidationErr) {
+        showAlert('warning', 'Missing Information', strValidationErr)
+        return
+    }
+
+    try {
+        const objResponse = await fetch('/generate', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify(objFormData)
+        })
+
+        await showAlert('success', 'Resume Ready', `Your resume has been downloaded as ${objFormData.strFirstName}_${objFormData.strLastName}_Resume.pdf`)
+    } catch (err) {
+        console.error("Error:", err)
+        showAlert('error', 'Generation Failed', err)
     }
 }
