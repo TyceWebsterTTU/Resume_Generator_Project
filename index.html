@@ -14,18 +14,18 @@
                 <div class="card">
                     <div class="card-header fw-bold text-center text-dark">
                         <img src="WebsterResumesLogo.png" alt="Webster Resume Logo" class="col-12">
-                        <h5>Fill in the fields below to generate your hit resume!</h5>
+                        <h5>Fill in the Fields Below to Generate Your Hit Resume!</h5>
                     </div>
                     <div class="card-body">
                         <form id="resumeForm">
                             <div class="mb-3">
                                 <h5>Personel Information</h5>
                                 <label class="form-label" for="txtFirstName">First Name</label>
-                                <input class="form-control" id="txtFirstName" type="text">
+                                <input class="form-control" id="txtFirstName" type="text" required>
                                 <label class="form-label" for="txtLastName">Last Name</label>
-                                <input class="form-control" id="txtLastName" type="text">
+                                <input class="form-control" id="txtLastName" type="text" required>
                                 <label class="form-label" for="txtEmail">Email</label>
-                                <input class="form-control" id="txtEmail" type="email">
+                                <input class="form-control" id="txtEmail" type="email" required>
                                 <label class="form-label" for="txtPhone">Phone Number</label>
                                 <input class="form-control" id="txtPhone" type="text">
                                 <label class="form-label" for="txtAddress">Address</label>
@@ -38,22 +38,27 @@
                             </div>
                             <div class="mb-3">
                                 <h5>Work Experience</h5>
-                                <label class="form-label" for="txtJobTitle">Job Title</label>
-                                <input class="form-control" id="txtJobTitle" type="text">
-                                <label class="form-label" for="txtCompany">Company</label>
-                                <input class="form-control" id="txtCompany" type="text">
-                                <label class="form-label" for="txtJobDescription">Job Description</label>
-                                <input class="form-control" id="txtJobDescription" type="text">
-                                <label class="form-label" for="txtJobLocation">Job Location</label>
-                                <input class="form-control" id="txtJobLocation" type="text">
-                                <label class="form-label" for="txtStartDate">Start Date</label>
-                                <input class="form-control" id="txtStartDate" type="text">
-                                <div class="form-check my-2">
-                                    <input class="form-check-input" type="checkbox" id="chkCurrentlyWorking">
-                                    <label class="form-check-label" for="chkCurrentlyWorking">Currently Working</label>
+                                <div id="jobInputArea">
+                                    <label class="form-label" for="txtJobTitle">Job Title</label>
+                                    <input class="form-control" id="txtJobTitle" type="text" required>
+                                    <label class="form-label" for="txtCompany">Company</label>
+                                    <input class="form-control" id="txtCompany" type="text" required>
+                                    <label class="form-label" for="txtJobDescription">Job Description</label>
+                                    <textarea class="form-control" id="txtJobDescription" type="text" required></textarea>
+                                    <label class="form-label" for="txtJobLocation">Job Location</label>
+                                    <input class="form-control" id="txtJobLocation" type="text" required>
+                                    <label class="form-label" for="txtStartDate">Start Date</label>
+                                    <input class="form-control" id="txtStartDate" type="text" required>
+                                    <div class="form-check my-2">
+                                        <input class="form-check-input" type="checkbox" id="chkCurrentlyWorking">
+                                        <label class="form-check-label" for="chkCurrentlyWorking">Currently Working</label>
+                                    </div>
+                                    <label class="form-label" for="txtEndDate">End Date</label>
+                                    <input class="form-control" id="txtEndDate" type="text" required>
+
+                                    <button class="btn btn-outline-secondary w-100 mt-2" type="button" id="btnAddJob">Add Job Experience</button>
                                 </div>
-                                <label class="form-label" for="txtEndDate">End Date</label>
-                                <input class="form-control" id="txtEndDate" type="text">
+                                <div id="jobContainer" class="mt-3 d-flex flex-column gap-2"><!-- Jobs will be appended here --></div>
                                 <hr>
                             </div>
                             <div class="mb-3">
@@ -74,24 +79,12 @@
                                 <div id="certsAwardsContainer" class="d-flex flex-wrap gap-2"><!-- Skills will be appended here as badges --></div>
                                 <hr>
                             </div>
+                            <div class="mb-3">
+                                <h5>Please Explain What Job You Are Applying For</h5>
+                                <textarea class="form-control" id="txtAppliedJobDescription" type="text"></textarea>
+                                <hr>
+                            </div>
                         </form>
-                        <!--
-                        <div class="row g-2 mt-2">
-                            <div class="col-6">
-                                <button id="addPersonelBtn" type="button" class="btn btn-primary w-100">Add Personel Information</button>
-                            </div>
-                            <div class="col-6">
-                                <button id="addJobsBtn" type="button" class="btn btn-primary w-100">Add Job Information</button>
-                            </div>
-                            <div class="col-6">
-                                <button id="addSkillsBtn" type="button" class="btn btn-primary w-100">Add Skills</button>
-                            </div>
-                            <div class="col-6">
-                                <button id="addCertsAwardsBtn" type="button" class="btn btn-primary w-100">Add Certifications & Awards</button>
-                            </div>
-                        </div>
-                        <hr>
-                        -->
                         <button id="generateResumeBtn" type="button" class="btn btn-lg btn-primary w-100 fw-bold py-4 mt-4 my-4" onclick="generateResume()">Generate Resume!</button>
                     </div>
                 </div>
