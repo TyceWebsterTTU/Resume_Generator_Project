@@ -1,5 +1,7 @@
+// For email validation
 const regEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
+// Custom function to all me to easily call my swalFire alerts throughout my project
 function showAlert(strIcon, strTitle, strText) {
     return Swal.fire({
         icon: strIcon,
@@ -8,6 +10,7 @@ function showAlert(strIcon, strTitle, strText) {
     })
 }
 
+// Checks if the user checks off the Currently Working button and disables the End Date function if it is checked
 $(document).ready(function() {
     $('#chkCurrentlyWorking').on('change', function() {
         if ($(this).is(':checked')) {
@@ -18,6 +21,7 @@ $(document).ready(function() {
     });
 })
 
+// Function that records the work experience data and generates a small card showing the data has been inputted on the form
 $(document).ready(function() {
     $('#btnAddJob').on('click', function() {
         // Create an object for this specific job
@@ -33,7 +37,7 @@ $(document).ready(function() {
         if (objJobData.strTitle && objJobData.strCompany) {
             // Create a "Job Card" badge that stores the data as a JSON string
             const strJobBadge = `
-                <div class="card bg-secondary text-white job-badge" data-job='${JSON.stringify(objJobData)}'>
+                <div class="card bg-primary text-white job-badge" data-job='${JSON.stringify(objJobData)}'>
                     <div class="card-body p-2 d-flex justify-content-between align-items-center">
                         <span><strong>${objJobData.strTitle}</strong> at ${objJobData.strCompany}</span>
                         <button type="button" class="btn-close btn-close-white remove-job"></button>
@@ -48,16 +52,19 @@ $(document).ready(function() {
             $('#txtEndDate').prop('disabled', false);
         }
     });
-
+    // Removes a job if a user chooses to do so
     $(document).on('click', '.remove-job', function() {
         $(this).closest('.job-badge').remove();
     });
 });
 
+// Function that records the skills data and generates a small card showing the data has been inputted on the form
 $(document).ready(function() {
     $('#btnAddSkill').on('click', function() {
+        // Create an object for this specific skill
         const strSkillValue = $('#txtSkillInput').val().trim();
 
+        // Create a "Skill Card" badge that stores the data as a JSON string
         if (strSkillValue !== "") {
             const objSkillBadge = `
                 <span class="badge bg-primary d-flex align-items-center p-2 skill-badge">
@@ -77,16 +84,19 @@ $(document).ready(function() {
             $('#btnAddSkill').click();
         }
     });
-
+    // Removes a skill if a user chooses to do so
     $(document).on('click', '.remove-skill', function() {
         $(this).parent('.skill-badge').remove();
     });
 });
 
+// Function that records the certification/awards data and generates a small card showing the data has been inputted on the form
 $(document).ready(function() {
     $('#btnAddCertsAwards').on('click', function() {
+        // Create an object for this specific certification/award
         const strCertsAwardsValue = $('#txtCertsAwardsInput').val().trim();
 
+        // Create a "Certification/Award Card" badge that stores the data as a JSON string
         if (strCertsAwardsValue !== "") {
             const objCertsAwardsBadge = `
                 <span class="badge bg-primary d-flex align-items-center p-2 cert-badge">
@@ -107,11 +117,13 @@ $(document).ready(function() {
         }
     });
 
+    // Removes a certification/award if a user chooses to do so
     $(document).on('click', '.remove-certsAwards', function() {
         $(this).closest('span').remove(); 
     });
 });
 
+// Function that returns all the data collected in the form. This makes inputting the data into the AI prompt much easier to manage
 function collectFormData() {
     return {
         strFirstName: $('#txtFirstName').val().trim(),
@@ -122,14 +134,15 @@ function collectFormData() {
         strLinkedIn: $('#txtLinkedIn').val().trim(),
         strGitHub: $('#txtGitHub').val().trim(),
 
+        // Maps all the data from the array for work experience
         arrWorkExperience: $('.job-badge').map(function() {
             return $(this).data('job'); 
         }).get(),
-
+        // Maps all the data from the array for skills
         arrSkills: $('.skill-badge').map(function() {
             return $(this).contents().get(0).nodeValue.trim()
         }).get(),
-
+        // Maps all the data from the array for certifications/awards
         arrCertsAwards: $('.cert-badge').map(function() {
             return $(this).contents().get(0).nodeValue.trim()
         }).get(),
@@ -138,6 +151,7 @@ function collectFormData() {
     }
 }
 
+// Function to validate the information being sent to the AI prompt
 function validateFormData(objData) {
     if(!objData.strFirstName) {
         return 'Please enter your first name.'
@@ -145,7 +159,7 @@ function validateFormData(objData) {
         return 'Please enter your last name.'
     } else if(!objData.strEmail) {
         return 'Please enter your email address.'
-    } else if(!regEmail.test(objData.strEmail)) {
+    } else if(!regEmail.test(objData.strEmail)) { // Validates the email address is valid
         return 'Please enter a valid email address.'
     } else if (!objData.arrWorkExperience || objData.arrWorkExperience == 0) {
         return 'Please add some work experience.'
@@ -154,28 +168,37 @@ function validateFormData(objData) {
     } else if (!objData.arrCertsAwards || objData.arrCertsAwards == 0) {
         return 'Please add some awards or certifications.'
     } else {
-        return null
+        return null // All data is valid and this needs to return nothing
     }
 }
 
+// This function will grab the resume generated from the AI and make it downloadable to the browser
+// AI was used to better understand how this function will work
 function downloadPdf(bufPdf, strFirst, strLast) {
     const strFileName = `${strFirst.replace(/\s+/g,'_')}_${strLast.replace(/\s+/g,'_')}_Resume.pdf`;
+
+    // Create a Blob (binary large object) from the PDF buffer
     const objBlob = new Blob([bufPdf], { type: 'application/pdf' });
     const strBlobUrl = URL.createObjectURL(objBlob);
 
+    // Creates tag to trigger the download
     const elLink = document.createElement('a');
     elLink.href = strBlobUrl
     elLink.download = strFileName
     elLink.style.display = 'none'
     document.body.appendChild(elLink)
     elLink.click()
+
+    // Cleanup
     document.body.removeChild(elLink)
     URL.revokeObjectURL(strBlobUrl)
 }
 
+// Generates the resume from the API in server.js
 async function generateResume() {
+    // Sets this object to all the data collected from the form
     const objFormData = collectFormData()
-
+    // Validates all the data in the form and gives the associated sweetAlert
     const strValidationErr = validateFormData(objFormData)
     if(strValidationErr) {
         showAlert('warning', 'Missing Information', strValidationErr)
@@ -183,12 +206,13 @@ async function generateResume() {
     }
 
     try {
+        // Post the data to the backend API to generate the resume
         const objResponse = await fetch('http://localhost:8000/generate', {
             method: 'POST',
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify(objFormData)
         })
-
+        // Error handling
         if (!objResponse.ok) {
             const strContentType = objResponse.headers.get("content-type")
             if (strContentType && strContentType.indexOf("application/json") !== -1) {
@@ -200,7 +224,7 @@ async function generateResume() {
             }
             return
         }
-
+        // Gets the response and initiates the download
         const bufPdf = await objResponse.arrayBuffer()
  
         downloadPdf(bufPdf, objFormData.strFirstName, objFormData.strLastName)

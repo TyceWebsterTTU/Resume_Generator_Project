@@ -1,0 +1,4 @@
+AI was used in this project in the following ways:
+- Google Gemini was used to generate both my logo for this project and the image of my favorite animal working on developing this project.
+- Claude was used to help me understand PDFkit library and how to better use it for my project.
+- Claude was used to help me understand how to use my downloadPdf function used in app.js
