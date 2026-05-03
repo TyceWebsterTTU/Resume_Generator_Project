@@ -158,6 +158,21 @@ function validateFormData(objData) {
     }
 }
 
+function downloadPdf(bufPdf, strFirst, strLast) {
+    const strFileName = `${strFirst.replace(/\s+/g,'_')}_${strLast.replace(/\s+/g,'_')}_Resume.pdf`;
+    const objBlob = new Blob([bufPdf], { type: 'application/pdf' });
+    const strBlobUrl = URL.createObjectURL(objBlob);
+
+    const elLink = document.createElement('a');
+    elLink.href = strBlobUrl
+    elLink.download = strFileName
+    elLink.style.display = 'none'
+    document.body.appendChild(elLink)
+    elLink.click()
+    document.body.removeChild(elLink)
+    URL.revokeObjectURL(strBlobUrl)
+}
+
 async function generateResume() {
     const objFormData = collectFormData()
 
@@ -168,13 +183,29 @@ async function generateResume() {
     }
 
     try {
-        const objResponse = await fetch('http:/localhost:8000/generate', {
+        const objResponse = await fetch('http://localhost:8000/generate', {
             method: 'POST',
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify(objFormData)
         })
 
-        await showAlert('success', 'Resume Ready', `Your resume has been downloaded as ${objFormData.strFirstName}_${objFormData.strLastName}_Resume.pdf`)
+        if (!objResponse.ok) {
+            const strContentType = objResponse.headers.get("content-type")
+            if (strContentType && strContentType.indexOf("application/json") !== -1) {
+                const objErr = await objResponse.json()
+                showAlert('error', 'Generation Failed', objErr.message || 'Server error.')
+            } else {
+                const strErrText = await objResponse.text()
+                showAlert('error', 'Generation Failed', strErrText)
+            }
+            return
+        }
+
+        const bufPdf = await objResponse.arrayBuffer()
+ 
+        downloadPdf(bufPdf, objFormData.strFirstName, objFormData.strLastName)
+
+        showAlert('success', 'Resume Ready', `Your resume has been downloaded as ${objFormData.strFirstName}_${objFormData.strLastName}_Resume.pdf`)
     } catch (err) {
         console.error("Error:", err)
         showAlert('error', 'Generation Failed', err)

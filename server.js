@@ -1,10 +1,12 @@
-const { GoogleGenAI } = require("@google/genai")
+const { GoogleGenAI } = require('@google/genai')
 const env = require('dotenv/config')
 const {v4: uuidv4} = require('uuid')
 const express = require("express")
 const sqlite3 = require("sqlite3").verbose()
 const cors = require("cors");
+const PDFDocument = require("pdfkit")
 
+const regEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
 const app = express()
 const HTTP_PORT = 8000
@@ -13,8 +15,7 @@ app.use(express.json())
 
 // Initialize the Google GenAI client with the API key from our .env file
 const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY)
-// identify the model we want to use for story generation
-const model = "gemini-3-flash-preview"
+const strModelName = 'gemini-3-flash-preview'
 
 const dbResumes = new sqlite3.Database('dbResume.db', (err) => {
     if(err){
@@ -31,9 +32,12 @@ app.listen(HTTP_PORT,() => {
 function buildPrompt (objData) {
     const strDateDisplay = objData.boolCurrent ? 'Present' : (objData.strEndDate || 'Present')
 
-    const strWorkExperienceList = objData.arrWorkExperience?.map(job => {
-        return `${job.strTitle} at ${job.strCompany} (${job.strStart} - ${job.strEnd}) - ${job.strDesc}`
-    }).join('\n') || 'Not Provided'
+    const strWorkList = objData.arrWorkExperience.length
+        ? objData.arrWorkExperience.map(j =>
+            `${j.strTitle} at ${j.strCompany} (${j.strLocation || 'N/A'}) ` +
+            `${j.strStart} to ${j.strEnd}: ${j.strDesc || 'No description'}`
+          ).join('\n')
+        : 'Not provided'
     const strSkillsList = objData.arrSkills?.join(', ') || 'Not Provided'
     const strCertsAwardsList = objData.arrCertsAwards?.join(', ') || 'Not Provided'
 
@@ -46,7 +50,7 @@ function buildPrompt (objData) {
     - LinkedIn: ${objData.strLinkedIn || 'Not Provided'}
     - GitHub: ${objData.strGitHub || 'Not Provided'}
     
-    WORK EXPERIENCE: ${strWorkExperienceList}
+    WORK EXPERIENCE: ${strWorkList}
     
     SKILLS: ${strSkillsList}
     
@@ -56,17 +60,51 @@ function buildPrompt (objData) {
     ${objData.strAppliedJob || 'General professional position'}`.trim()
 }
 
+function buildPdf (strContent) {
+    return new Promise((fnResolve, fnReject) => {
+        try {
+            const objDoc = new PDFDocument({ margin: 50, size: 'LETTER' })
+            const arrChunks = []
+            objDoc.on('data', (buf) => arrChunks.push(buf))
+            objDoc.on('end', () => fnResolve(Buffer.concat(arrChunks)))
+            objDoc.on('error', fnReject)
+ 
+            strContent.split('\n').forEach((strRaw) => {
+                const strLine = strRaw.trimEnd()
+ 
+                if (!strLine.trim()) {
+                    objDoc.moveDown(0.4)
+                } else {
+                    objDoc
+                        .fontSize(11)
+                        .font('Helvetica')
+                        .fillColor('#111111')
+                        .text(strLine, { lineGap: 2 })
+                }
+            })
+ 
+            objDoc.end()
+        } catch (err) {
+            fnReject(err)
+        }
+    })
+}
+
 app.post('/generate', async (req, res) => {
     try {
         const objData = req.body
         const strResumeID = uuidv4()
 
+        console.log(`Calling Gemini for ${objData.strFirstName}`)
+
         const strPrompt = buildPrompt(objData)
         const objResponse = await genAI.models.generateContent({
-            model: model,
+            model: strModelName,
             contents: strPrompt,
         });
-        console.log(objResponse.text)
+        console.log(objResponse.text) 
+        
+        const strResumeText = objResponse.text
 
         const strQuery = "INSERT INTO tblResumes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         dbResumes.run(strQuery, [
@@ -82,11 +120,18 @@ app.post('/generate', async (req, res) => {
             objData.arrSkills.join(', '),
             objData.arrCertsAwards.join(', '),
             objData.strAppliedJob
-        ], function(err) {
+        ], async function(err) {
             if(err) {
                 res.status(400).json({message:"Failed to generate resume"})
             } else {
-                res.status(201).json({message: "Resume generated successfully"})
+                console.log(`Saved resume: ${strResumeID}`)
+            
+                const bufPdf = await buildPdf(strResumeText)
+
+                res.setHeader('Content-Type', 'application/pdf')
+                res.setHeader('Content-Disposition', `attachment; filename=${objData.strFirstName}_${objData.strLastName}_Resume.pdf`)
+                
+                res.status(200).send(bufPdf)
             }
         })
     } catch (err) {
